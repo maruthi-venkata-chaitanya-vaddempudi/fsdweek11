@@ -3,6 +3,9 @@ const express = require("express");
 const app = express();
 const PORT = 3000;
 
+app.set("view engine", "ejs");
+app.use(express.urlencoded({ extended: true }));
+
 // -----------------------------
 // Middleware 1: JSON Parser
 // -----------------------------
@@ -169,6 +172,62 @@ function checkApiKey(req, res, next) {
 // This route requires the API key
 app.get("/protected", checkApiKey, (req, res) => {
     res.send("Access granted to protected route");
+});
+
+// =====================================================
+// PART (d) – EJS USER LIST AND REGISTRATION
+// =====================================================
+
+app.get("/users", (req, res) => {
+    const users = [
+        { name: "John Doe", email: "john@example.com", age: 25 },
+        { name: "Jane Smith", email: "jane@example.com", age: 30 }
+    ];
+
+    res.render("users", { users });
+});
+
+app.get("/register", (req, res) => {
+    res.render("register", {
+        error: "",
+        values: { name: "", email: "", age: "" }
+    });
+});
+
+app.post("/register", (req, res) => {
+    const values = {
+        name: typeof req.body.name === "string" ? req.body.name.trim() : "",
+        email: typeof req.body.email === "string" ? req.body.email.trim() : "",
+        age: typeof req.body.age === "string" ? req.body.age.trim() : ""
+    };
+    const age = Number(values.age);
+
+    if (!values.name || !values.email || !values.age) {
+        return res.status(400).render("register", {
+            error: "All fields are required.",
+            values
+        });
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
+        return res.status(400).render("register", {
+            error: "Enter a valid email address.",
+            values
+        });
+    }
+
+    if (!Number.isInteger(age) || age < 0) {
+        return res.status(400).render("register", {
+            error: "Enter a valid age.",
+            values
+        });
+    }
+
+    res.render("success", {
+        name: values.name,
+        email: values.email,
+        age
+    });
 });
 
 // =====================================================

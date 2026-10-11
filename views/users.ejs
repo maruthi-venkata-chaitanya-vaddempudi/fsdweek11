@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>User List</title>
+  <style>
+    body { max-width: 720px; margin: 48px auto; padding: 0 24px; color: #1f2937; font: 16px/1.6 system-ui, sans-serif; }
+    h1 { color: #163b70; }
+    li { padding: 8px 0; }
+    .total { margin-top: 24px; font-weight: 700; }
+    a { color: #1759a6; }
+  </style>
+</head>
+<body>
+  <h1>User List</h1>
+
+  <% if (users.length === 0) { %>
+    <p>No users found.</p>
+  <% } else { %>
+    <ol>
+      <% users.forEach(user => { %>
+        <li><%= user.name %> (<%= user.email %>) - <%= user.age %> years</li>
+      <% }); %>
+    </ol>
+    <p class="total">Total users: <%= users.length %></p>
+  <% } %>
+
+  <p><a href="/register">Register a user</a></p>
+</body>
+</html>
