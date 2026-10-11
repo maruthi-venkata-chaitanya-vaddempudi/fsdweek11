@@ -2,13 +2,13 @@
   "name": "fsdd3",
   "version": "1.0.0",
   "description": "ExpressJS, Mongoose CRUD, and SPA demos",
-  "homepage": "https://github.com/maruthi-venkata-chaitanya-vaddempudi/fsdweek3#readme",
+  "homepage": "https://github.com/maruthi-venkata-chaitanya-vaddempudi/fsdweek4#readme",
   "bugs": {
-    "url": "https://github.com/maruthi-venkata-chaitanya-vaddempudi/fsdweek3/issues"
+    "url": "https://github.com/maruthi-venkata-chaitanya-vaddempudi/fsdweek4/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/maruthi-venkata-chaitanya-vaddempudi/fsdweek3.git"
+    "url": "git+https://github.com/maruthi-venkata-chaitanya-vaddempudi/fsdweek4.git"
   },
   "license": "ISC",
   "author": "",
