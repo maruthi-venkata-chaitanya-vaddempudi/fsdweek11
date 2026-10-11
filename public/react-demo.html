@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f3f6fb">
+  <title>React Building Blocks</title>
+  <style>
+    :root { color-scheme: light; --ink: #172b3a; --muted: #627589; --line: #e0e8ef; --blue: #2563eb; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f3f6fb; color: var(--ink); font: 16px/1.55 Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+    .page-shell { width: min(960px, calc(100% - 36px)); margin: 42px auto 30px; }
+    .hero { position: relative; overflow: hidden; padding: 34px 38px; border-radius: 19px; background: linear-gradient(120deg, #112b4b, #254c87 65%, #3e68a8); color: white; box-shadow: 0 16px 35px #1b3d6827; }
+    .hero::after { position: absolute; right: -46px; top: -116px; width: 300px; height: 300px; border: 1px solid #ffffff20; border-radius: 50%; box-shadow: 0 0 0 34px #ffffff0b, 0 0 0 70px #ffffff08; content: ""; }
+    .back-link { position: absolute; top: 18px; right: 23px; color: #e3edff; font-size: .8rem; text-decoration: none; }
+    .eyebrow { color: #b7d0ff; font-size: .78rem; font-weight: 750; letter-spacing: .13em; text-transform: uppercase; }
+    .hero h1 { position: relative; z-index: 1; margin: 9px 0 3px; font-size: clamp(2rem, 5vw, 2.8rem); letter-spacing: -.035em; }
+    .hero > p { position: relative; z-index: 1; margin: 6px 0 0; color: #dce8f8; }
+    .hero-tags { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 21px; }
+    .hero-tags span { padding: 5px 10px; border: 1px solid #ffffff37; border-radius: 999px; background: #ffffff12; color: #eff5ff; font-size: .78rem; }
+    .lesson-card { margin-top: 17px; padding: 23px 26px; border: 1px solid var(--line); border-radius: 14px; background: white; box-shadow: 0 5px 20px #15385b08; }
+    .section-heading { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+    .step { display: grid; width: 40px; height: 40px; flex: 0 0 40px; place-items: center; border-radius: 12px; background: #eaf0ff; color: #315eb0; font-size: .92rem; font-weight: 800; }
+    h2 { margin: 0; font-size: 1.13rem; letter-spacing: -.01em; }
+    .section-heading p { margin: 2px 0 0; color: var(--muted); font-size: .9rem; }
+    .output-block { padding: 16px 19px; border: 1px solid #e4ebf3; border-radius: 10px; background: #f8fafc; }
+    .output-block h3 { margin: 0 0 6px; font-size: 1.16rem; }
+    .output-block p { margin: 4px 0; color: #405468; }
+    .jsx-output { border-color: #dce9fb; background: #f6f9ff; }
+    .jsx-output h3 { color: #1e4e91; }
+    .expression-result { font-weight: 700; }
+    .style-chip { display: inline-flex; margin-top: 10px; padding: 5px 11px; border-radius: 7px; background: #dff5ed; color: #176348; font-size: .83rem; font-weight: 700; }
+    pre { overflow-x: auto; margin: 12px 0 0; padding: 10px 12px; border-radius: 8px; background: #172b3a; color: #d8e7f4; font: .79rem/1.5 ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .component-output { display: grid; grid-template-columns: 1fr 1px 1fr; align-items: center; gap: 22px; padding: 15px 18px; border: 1px solid #e4ebf3; border-radius: 10px; background: #f8fafc; }
+    .component-type { color: #71849a; font-size: .7rem; font-weight: 800; letter-spacing: .11em; }
+    .greeting, .welcome-message { margin: 7px 0 0; font-size: 1.12rem; font-weight: 700; }
+    .component-divider { align-self: stretch; background: var(--line); }
+    footer { display: flex; justify-content: space-between; gap: 12px; padding: 19px 6px 0; color: #738397; font-size: .8rem; }
+    @media (max-width: 600px) { .page-shell { width: min(100% - 22px, 960px); margin-top: 12px; } .hero { padding: 38px 23px 24px; } .back-link { top: 12px; right: 15px; } .lesson-card { padding: 18px 16px; } .component-output { gap: 12px; padding: 13px; } footer { flex-direction: column; } }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script src="/react-demo.js"></script>
+</body>
+</html>

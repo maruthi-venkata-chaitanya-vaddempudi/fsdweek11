@@ -1,5 +1,13 @@
 # fsdweek4
 
+## ReactJS building blocks
+
+Install dependencies with `npm install`, then run `npm start`. Open
+`http://localhost:3000/react-demo.html` to see HTML rendered without JSX,
+JSX expressions and inline styles, and nested function and class components.
+The JSX source is in `src/react-demo.jsx`; the start script bundles it for the
+browser with esbuild. A link to this demo is also available from the item page.
+
 ## MongoDB CRUD and SPA
 
 Install the project dependencies with `npm install`. Copy `.env.example` to
