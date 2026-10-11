@@ -45,7 +45,7 @@ app.use(timer);
 
 // Basic Route
 app.get("/", (req, res) => {
-    res.send("Welcome to ExpressJS Routing Demo");
+    res.send("Welcome to ExpressJS!");
 });
 
 // Route Parameter
@@ -64,6 +64,10 @@ app.get("/search", (req, res) => {
 });
 
 // URL Building using req.originalUrl
+app.get("/current-url", (req, res) => {
+    res.send(`Current URL: ${req.originalUrl}`);
+});
+
 app.get("/url", (req, res) => {
     res.json({
         message: "Current requested URL",
