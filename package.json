@@ -1,7 +1,7 @@
 {
   "name": "fsdd3",
   "version": "1.0.0",
-  "description": "ExpressJS routing and middleware demo",
+  "description": "ExpressJS, Mongoose CRUD, and SPA demos",
   "homepage": "https://github.com/maruthi-venkata-chaitanya-vaddempudi/fsdweek3#readme",
   "bugs": {
     "url": "https://github.com/maruthi-venkata-chaitanya-vaddempudi/fsdweek3/issues"
@@ -15,11 +15,14 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "dotenv": "^18.0.7",
     "ejs": "^7.0.1",
     "express": "^5.3.0",
-    "express-session": "^1.19.0"
+    "express-session": "^1.19.0",
+    "mongoose": "^9.11.1"
   }
 }

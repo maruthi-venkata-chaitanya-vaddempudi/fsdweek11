@@ -1,5 +1,19 @@
 # fsdweek3
 
+## MongoDB CRUD and SPA
+
+Install the project dependencies with `npm install`. Copy `.env.example` to
+`.env` and set `MONGO_URI` to your local MongoDB or private Atlas connection
+string. Start MongoDB, then run `npm start` and open `http://localhost:3000`.
+The item form uses the Fetch API and `/api/items` REST endpoints to create,
+list, update, and delete MongoDB records without reloading the page.
+If MongoDB is unavailable, the app reports the connection error and the item
+API responds with HTTP 503; start MongoDB and restart the app to connect.
+
+The application also retains the earlier Express demos: `/users` and
+`/register` for EJS, and `/session-demo` or `/login` for sessions and
+authentication.
+
 ## ExpressJS EJS user registration demo
 
 Install dependencies and start the server:

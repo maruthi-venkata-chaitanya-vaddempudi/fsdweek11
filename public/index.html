@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#12324b">
+  <title>MongoDB Item Manager</title>
+  <style>
+    :root { color-scheme: light; --ink: #172b3a; --muted: #64748b; --line: #d9e2ea; --blue: #1769aa; --red: #b42318; --green: #16794b; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f3f6f9; color: var(--ink); font: 16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+    header { background: #12324b; color: white; padding: 30px max(24px, calc((100vw - 1040px) / 2)); }
+    header h1 { margin: 0; font-size: clamp(1.7rem, 4vw, 2.3rem); }
+    header p { margin: 6px 0 0; color: #d2e1ed; }
+    main { width: min(1040px, calc(100% - 32px)); margin: 28px auto 56px; }
+    .panel { padding: 24px; margin-bottom: 22px; background: white; border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 5px 18px #12324b0b; }
+    h2 { margin: 0 0 16px; font-size: 1.25rem; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    label { display: block; color: #33485a; font-size: .92rem; font-weight: 600; }
+    input:not([type=checkbox]) { width: 100%; margin-top: 6px; padding: 11px 12px; border: 1px solid #bbc9d5; border-radius: 7px; font: inherit; }
+    input:focus { outline: 3px solid #1769aa30; border-color: var(--blue); }
+    .check { display: flex; align-items: center; gap: 9px; margin-top: 23px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+    button { padding: 10px 15px; border: 0; border-radius: 7px; background: var(--blue); color: white; font: inherit; font-weight: 650; cursor: pointer; }
+    button.secondary { background: #e9eff4; color: #263c4f; }
+    button.danger { background: #fff0ee; color: var(--red); }
+    button:disabled { opacity: .55; cursor: wait; }
+    #message { min-height: 24px; margin: 12px 0 0; font-weight: 600; }
+    #message[data-kind=error] { color: var(--red); }
+    #message[data-kind=success] { color: var(--green); }
+    .items-header { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+    #itemCount { color: var(--muted); font-size: .92rem; }
+    #items { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+    .item { padding: 18px; border: 1px solid var(--line); border-radius: 9px; background: #fff; }
+    .item h3 { margin: 0; font-size: 1.1rem; }
+    .price { margin: 8px 0; color: #145b8f; font-size: 1.2rem; font-weight: 750; }
+    .description { min-height: 24px; margin: 4px 0 12px; color: #4b6071; }
+    .stock { display: inline-block; padding: 3px 9px; border-radius: 999px; background: #e8f6ee; color: var(--green); font-size: .83rem; font-weight: 700; }
+    .stock.out { background: #fff1ed; color: var(--red); }
+    .item-actions { display: flex; gap: 8px; margin-top: 16px; }
+    .empty { grid-column: 1 / -1; padding: 26px; border: 1px dashed #bbc9d5; border-radius: 9px; color: var(--muted); text-align: center; }
+    footer { padding: 0 16px 24px; color: var(--muted); text-align: center; font-size: .9rem; }
+    @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } .check { margin-top: 0; } .panel { padding: 18px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>MongoDB Item Manager</h1>
+    <p>Mongoose CRUD API · Fetch-powered single-page app</p>
+  </header>
+  <main>
+    <section class="panel" aria-labelledby="formTitle">
+      <h2 id="formTitle">Add an item</h2>
+      <form id="itemForm">
+        <div class="form-grid">
+          <label for="name">Item name
+            <input id="name" name="name" placeholder="e.g. Laptop" maxlength="120" required>
+          </label>
+          <label for="price">Price
+            <input id="price" name="price" type="number" min="0" step="0.01" placeholder="999.99" required>
+          </label>
+          <label for="description">Description
+            <input id="description" name="description" placeholder="Short item description" maxlength="500">
+          </label>
+          <label class="check" for="inStock">
+            <input id="inStock" name="inStock" type="checkbox"> In stock
+          </label>
+        </div>
+        <div class="actions">
+          <button id="saveButton" type="submit">Save item</button>
+          <button id="cancelButton" class="secondary" type="button" hidden>Cancel edit</button>
+        </div>
+      </form>
+      <p id="message" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="panel" aria-labelledby="listTitle">
+      <div class="items-header">
+        <h2 id="listTitle">Item list</h2>
+        <span id="itemCount">Loading items…</span>
+      </div>
+      <div id="items" aria-live="polite"></div>
+    </section>
+  </main>
+  <footer>Changes are saved to MongoDB through the Express REST API.</footer>
+
+  <script>
+    const form = document.getElementById("itemForm");
+    const list = document.getElementById("items");
+    const message = document.getElementById("message");
+    const saveButton = document.getElementById("saveButton");
+    const cancelButton = document.getElementById("cancelButton");
+    const formTitle = document.getElementById("formTitle");
+    const itemCount = document.getElementById("itemCount");
+    let editId = null;
+
+    async function api(url, options) {
+      const response = await fetch(url, options);
+      const result = await response.json();
+      if (!response.ok) {
+        const error = new Error(result.error || `Request failed (${response.status})`);
+        error.status = response.status;
+        throw error;
+      }
+      return result;
+    }
+
+    function showMessage(text, kind = "success") {
+      message.textContent = text;
+      message.dataset.kind = kind;
+    }
+
+    function makeItemCard(item) {
+      const card = document.createElement("article");
+      card.className = "item";
+
+      const title = document.createElement("h3");
+      title.textContent = item.name;
+      const price = document.createElement("p");
+      price.className = "price";
+      price.textContent = `$${Number(item.price).toFixed(2)}`;
+      const description = document.createElement("p");
+      description.className = "description";
+      description.textContent = item.description || "No description";
+      const stock = document.createElement("span");
+      stock.className = item.inStock ? "stock" : "stock out";
+      stock.textContent = item.inStock ? "In stock" : "Out of stock";
+
+      const actions = document.createElement("div");
+      actions.className = "item-actions";
+      const edit = document.createElement("button");
+      edit.className = "secondary";
+      edit.textContent = "Edit";
+      edit.setAttribute("aria-label", `Edit ${item.name}`);
+      edit.addEventListener("click", () => beginEdit(item));
+      const remove = document.createElement("button");
+      remove.className = "danger";
+      remove.textContent = "Delete";
+      remove.setAttribute("aria-label", `Delete ${item.name}`);
+      remove.addEventListener("click", () => deleteItem(item));
+
+      actions.append(edit, remove);
+      card.append(title, price, description, stock, actions);
+      return card;
+    }
+
+    async function loadItems() {
+      itemCount.textContent = "Loading items…";
+      try {
+        const items = await api("/api/items");
+        list.replaceChildren();
+        if (message.dataset.kind === "error") {
+          message.textContent = "";
+          message.removeAttribute("data-kind");
+        }
+        itemCount.textContent = `${items.length} ${items.length === 1 ? "item" : "items"}`;
+        if (items.length === 0) {
+          const empty = document.createElement("p");
+          empty.className = "empty";
+          empty.textContent = "No items yet. Add your first item using the form above.";
+          list.append(empty);
+          return;
+        }
+        items.forEach(item => list.append(makeItemCard(item)));
+      } catch (error) {
+        itemCount.textContent = "Items unavailable";
+        list.replaceChildren();
+        const failure = document.createElement("p");
+        failure.className = "empty";
+        failure.textContent = error.message;
+        list.append(failure);
+        if (error.status === 503) {
+          const retry = document.createElement("button");
+          retry.textContent = "Retry connection";
+          retry.addEventListener("click", loadItems);
+          list.append(retry);
+        }
+        showMessage("Could not load items. Check the server and MongoDB connection.", "error");
+      }
+    }
+
+    function beginEdit(item) {
+      editId = item._id;
+      form.elements.name.value = item.name;
+      form.elements.description.value = item.description || "";
+      form.elements.price.value = item.price;
+      form.elements.inStock.checked = Boolean(item.inStock);
+      formTitle.textContent = "Edit item";
+      saveButton.textContent = "Update item";
+      cancelButton.hidden = false;
+      form.elements.name.focus();
+    }
+
+    function resetForm() {
+      form.reset();
+      editId = null;
+      formTitle.textContent = "Add an item";
+      saveButton.textContent = "Save item";
+      cancelButton.hidden = true;
+    }
+
+    async function deleteItem(item) {
+      if (!window.confirm(`Delete "${item.name}"?`)) return;
+      try {
+        await api(`/api/items/${encodeURIComponent(item._id)}`, { method: "DELETE" });
+        if (editId === item._id) resetForm();
+        showMessage("Item deleted.");
+        await loadItems();
+      } catch (error) {
+        showMessage(error.message, "error");
+      }
+    }
+
+    cancelButton.addEventListener("click", resetForm);
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+      saveButton.disabled = true;
+      try {
+        const data = {
+          name: form.elements.name.value.trim(),
+          description: form.elements.description.value.trim(),
+          price: Number(form.elements.price.value),
+          inStock: form.elements.inStock.checked
+        };
+        const wasEditing = Boolean(editId);
+        await api(wasEditing ? `/api/items/${encodeURIComponent(editId)}` : "/api/items", {
+          method: wasEditing ? "PUT" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+        resetForm();
+        showMessage(wasEditing ? "Item updated." : "Item added.");
+        await loadItems();
+      } catch (error) {
+        showMessage(error.message, "error");
+      } finally {
+        saveButton.disabled = false;
+      }
+    });
+
+    loadItems();
+  </script>
+</body>
+</html>

@@ -1,8 +1,14 @@
 const express = require("express");
 const session = require("express-session");
+const mongoose = require("mongoose");
+const dotenv = require("dotenv");
+const path = require("path");
+
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/fsdweek3";
 
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
@@ -17,6 +23,7 @@ app.use(session({
 // Middleware 1: JSON Parser
 // -----------------------------
 app.use(express.json());
+app.use(express.static(path.join(__dirname, "public")));
 
 // -----------------------------
 // Middleware 2: Logger
@@ -55,7 +62,7 @@ app.use(timer);
 
 // Basic Route
 app.get("/", (req, res) => {
-    res.send('Welcome to ExpressJS! <a href="/session-demo">Session management demo</a>');
+    res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // Route Parameter
@@ -330,6 +337,126 @@ app.get("/logout", (req, res, next) => {
 });
 
 // =====================================================
+// PART (f) – MONGOOSE ITEM CRUD API
+// =====================================================
+
+const itemSchema = new mongoose.Schema({
+    name: { type: String, required: true, trim: true },
+    description: { type: String, trim: true, default: "" },
+    price: { type: Number, required: true, min: 0 },
+    inStock: { type: Boolean, default: false }
+}, { timestamps: true });
+
+const Item = mongoose.model("Item", itemSchema);
+
+app.use("/api/items", (req, res, next) => {
+    if (mongoose.connection.readyState !== 1) {
+        return res.status(503).json({
+            error: "MongoDB is not connected. Start MongoDB and restart the app."
+        });
+    }
+    next();
+});
+
+function validateItemInput(body) {
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+        return { error: "Request body must be a JSON object." };
+    }
+
+    const name = typeof body.name === "string" ? body.name.trim() : "";
+    if (!name) return { error: "Item name is required." };
+
+    if (body.price === undefined || body.price === null || body.price === "") {
+        return { error: "Price is required." };
+    }
+    const price = typeof body.price === "number" ? body.price : Number(body.price);
+    if (!Number.isFinite(price) || price < 0) {
+        return { error: "Price must be a non-negative number." };
+    }
+
+    if (body.description !== undefined && typeof body.description !== "string") {
+        return { error: "Description must be a string." };
+    }
+
+    if (body.inStock !== undefined && typeof body.inStock !== "boolean") {
+        return { error: "inStock must be a boolean." };
+    }
+
+    return {
+        value: {
+            name,
+            description: body.description?.trim() || "",
+            price,
+            inStock: body.inStock ?? false
+        }
+    };
+}
+
+function validItemId(req, res, next) {
+    if (!mongoose.isObjectIdOrHexString(req.params.id)) {
+        return res.status(400).json({ error: "Invalid item ID." });
+    }
+    next();
+}
+
+app.post("/api/items", async (req, res, next) => {
+    const input = validateItemInput(req.body);
+    if (input.error) return res.status(400).json({ error: input.error });
+
+    try {
+        const item = await Item.create(input.value);
+        res.status(201).json(item);
+    } catch (error) {
+        next(error);
+    }
+});
+
+app.get("/api/items", async (req, res, next) => {
+    try {
+        res.json(await Item.find().sort({ createdAt: -1 }));
+    } catch (error) {
+        next(error);
+    }
+});
+
+app.get("/api/items/:id", validItemId, async (req, res, next) => {
+    try {
+        const item = await Item.findById(req.params.id);
+        if (!item) return res.status(404).json({ error: "Item not found." });
+        res.json(item);
+    } catch (error) {
+        next(error);
+    }
+});
+
+app.put("/api/items/:id", validItemId, async (req, res, next) => {
+    const input = validateItemInput(req.body);
+    if (input.error) return res.status(400).json({ error: input.error });
+
+    try {
+        const item = await Item.findByIdAndUpdate(
+            req.params.id,
+            { $set: input.value },
+            { new: true, runValidators: true }
+        );
+        if (!item) return res.status(404).json({ error: "Item not found." });
+        res.json(item);
+    } catch (error) {
+        next(error);
+    }
+});
+
+app.delete("/api/items/:id", validItemId, async (req, res, next) => {
+    try {
+        const item = await Item.findByIdAndDelete(req.params.id);
+        if (!item) return res.status(404).json({ error: "Item not found." });
+        res.json({ message: "Item deleted successfully." });
+    } catch (error) {
+        next(error);
+    }
+});
+
+// =====================================================
 // 404 HANDLER
 // =====================================================
 
@@ -337,10 +464,32 @@ app.use((req, res) => {
     res.status(404).send("Route Not Found");
 });
 
+app.use((error, req, res, next) => {
+    console.error("Request failed:", error);
+    if (res.headersSent) return next(error);
+
+    const status = error.name === "ValidationError" ||
+        error.name === "CastError" ||
+        error.type === "entity.parse.failed"
+        ? 400
+        : 500;
+    res.status(status).json({
+        error: status === 400 ? error.message : "A server error occurred."
+    });
+});
+
 // =====================================================
 // START SERVER
 // =====================================================
 
+mongoose.set("bufferCommands", false);
 app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);
 });
+mongoose.connect(MONGO_URI)
+    .then(() => {
+        console.log("Connected to MongoDB.");
+    })
+    .catch(error => {
+        console.error("MongoDB connection error:", error.message);
+    });
