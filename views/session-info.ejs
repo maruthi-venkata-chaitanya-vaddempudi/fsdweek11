@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Session Details</title>
+  <style>
+    body { max-width: 720px; margin: 48px auto; padding: 0 24px; color: #1f2937; font: 16px/1.7 system-ui, sans-serif; overflow-wrap: anywhere; }
+    h1 { color: #163b70; }
+    a { color: #1759a6; }
+  </style>
+</head>
+<body>
+  <h1>Session Details</h1>
+  <% if (!sessionData) { %>
+    <p>No session found.</p>
+  <% } else { %>
+    <p>Username: <%= sessionData.username %></p>
+    <p>Visit Count: <%= sessionData.visitCount %></p>
+    <p>Session ID: <%= sessionData.sessionId %></p>
+  <% } %>
+  <p><a href="/session-info">Refresh Session Details</a></p>
+  <p><a href="/destroy-session">Destroy Session</a></p>
+  <p><a href="/session-demo">Home</a></p>
+</body>
+</html>

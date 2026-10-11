@@ -1,10 +1,17 @@
 const express = require("express");
+const session = require("express-session");
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
+app.use(session({
+    secret: process.env.SESSION_SECRET || "local-demo-secret-change-before-deployment",
+    resave: false,
+    saveUninitialized: false,
+    cookie: { maxAge: 60000, httpOnly: true }
+}));
 
 // -----------------------------
 // Middleware 1: JSON Parser
@@ -48,7 +55,7 @@ app.use(timer);
 
 // Basic Route
 app.get("/", (req, res) => {
-    res.send("Welcome to ExpressJS!");
+    res.send('Welcome to ExpressJS! <a href="/session-demo">Session management demo</a>');
 });
 
 // Route Parameter
@@ -227,6 +234,98 @@ app.post("/register", (req, res) => {
         name: values.name,
         email: values.email,
         age
+    });
+});
+
+// =====================================================
+// PART (e) – SESSION MANAGEMENT AND AUTHENTICATION
+// =====================================================
+
+app.get("/session-demo", (req, res) => {
+    res.render("session-home");
+});
+
+app.get("/set-session", (req, res, next) => {
+    req.session.username = "admin";
+    req.session.visitCount = 0;
+    req.session.save(error => {
+        if (error) return next(error);
+        res.send('Session created. <a href="/session-info">View Session</a>');
+    });
+});
+
+app.get("/session-info", (req, res, next) => {
+    if (!req.session.username) {
+        return res.render("session-info", { sessionData: null });
+    }
+
+    req.session.visitCount = (req.session.visitCount || 0) + 1;
+    req.session.save(error => {
+        if (error) return next(error);
+        res.render("session-info", {
+            sessionData: {
+                username: req.session.username,
+                visitCount: req.session.visitCount,
+                sessionId: req.sessionID
+            }
+        });
+    });
+});
+
+app.get("/destroy-session", (req, res, next) => {
+    req.session.destroy(error => {
+        if (error) return next(error);
+        res.clearCookie("connect.sid");
+        res.send('Session destroyed. <a href="/session-demo">Home</a>');
+    });
+});
+
+app.get("/login", (req, res) => {
+    res.render("login", { error: "" });
+});
+
+app.post("/login", (req, res, next) => {
+    const { username, password } = req.body;
+
+    if (username !== "admin" || password !== "1234") {
+        return res.status(401).render("login", {
+            error: "Invalid username or password."
+        });
+    }
+
+    req.session.regenerate(error => {
+        if (error) return next(error);
+        req.session.user = username;
+        req.session.visitCount = 0;
+        req.session.save(saveError => {
+            if (saveError) return next(saveError);
+            res.redirect("/dashboard");
+        });
+    });
+});
+
+function isAuthenticated(req, res, next) {
+    if (req.session.user) return next();
+    res.redirect("/login");
+}
+
+app.get("/dashboard", isAuthenticated, (req, res, next) => {
+    req.session.visitCount = (req.session.visitCount || 0) + 1;
+    req.session.save(error => {
+        if (error) return next(error);
+        res.render("dashboard", {
+            username: req.session.user,
+            sessionId: req.sessionID,
+            visitCount: req.session.visitCount
+        });
+    });
+});
+
+app.get("/logout", (req, res, next) => {
+    req.session.destroy(error => {
+        if (error) return next(error);
+        res.clearCookie("connect.sid");
+        res.redirect("/login");
     });
 });
 
