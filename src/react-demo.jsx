@@ -29,7 +29,7 @@ function App() {
     return (
         <main className="page-shell">
             <header className="hero">
-                <a className="back-link" href="/">Express learning lab</a>
+                <a className="back-link" href="/products.html">Products &amp; state →</a>
                 <span className="eyebrow">ReactJS · Experiment 01</span>
                 <h1>React Building Blocks</h1>
                 <p>From rendered elements to JSX and reusable, nested components.</p>

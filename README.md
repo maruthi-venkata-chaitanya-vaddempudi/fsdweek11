@@ -1,4 +1,11 @@
-# fsdweek5
+# fsdweek6
+
+## React props, state, Sass, and events
+
+Run `npm start`, then open `http://localhost:3000/products.html`. The React
+products SPA demonstrates product props, `useState`, cart updates, controlled
+form events, and interactive card hover events. Styles are authored in
+`src/products-app.scss`; the start script compiles Sass and bundles the JSX.
 
 ## ReactJS building blocks
 

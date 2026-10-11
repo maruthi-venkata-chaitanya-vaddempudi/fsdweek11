@@ -2,20 +2,20 @@
   "name": "fsdd3",
   "version": "1.0.0",
   "description": "ExpressJS, Mongoose CRUD, and SPA demos",
-  "homepage": "https://github.com/maruthi-venkata-chaitanya-vaddempudi/fsdweek5#readme",
+  "homepage": "https://github.com/maruthi-venkata-chaitanya-vaddempudi/fsdweek6#readme",
   "bugs": {
-    "url": "https://github.com/maruthi-venkata-chaitanya-vaddempudi/fsdweek5/issues"
+    "url": "https://github.com/maruthi-venkata-chaitanya-vaddempudi/fsdweek6/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/maruthi-venkata-chaitanya-vaddempudi/fsdweek5.git"
+    "url": "git+https://github.com/maruthi-venkata-chaitanya-vaddempudi/fsdweek6.git"
   },
   "license": "ISC",
   "author": "",
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "build:react": "esbuild src/react-demo.jsx --bundle --minify --outfile=public/react-demo.js --loader:.jsx=jsx",
+    "build:react": "sass src/products-app.scss public/products-app.css --no-source-map && esbuild src/react-demo.jsx --bundle --minify --outfile=public/react-demo.js --loader:.jsx=jsx && esbuild src/products-app.jsx --bundle --minify --outfile=public/products-app.js --loader:.jsx=jsx",
     "start": "npm run build:react && node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -29,6 +29,7 @@
     "react-dom": "^19.3.0"
   },
   "devDependencies": {
-    "esbuild": "^0.28.2"
+    "esbuild": "^0.28.2",
+    "sass": "^1.105.1"
   }
 }
