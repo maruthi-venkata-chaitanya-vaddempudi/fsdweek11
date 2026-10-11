@@ -2,13 +2,13 @@
   "name": "fsdd3",
   "version": "1.0.0",
   "description": "ExpressJS routing and middleware demo",
-  "homepage": "https://github.com/maruthi-venkata-chaitanya-vaddempudi/fsdweek2#readme",
+  "homepage": "https://github.com/maruthi-venkata-chaitanya-vaddempudi/fsdweek3#readme",
   "bugs": {
-    "url": "https://github.com/maruthi-venkata-chaitanya-vaddempudi/fsdweek2/issues"
+    "url": "https://github.com/maruthi-venkata-chaitanya-vaddempudi/fsdweek3/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/maruthi-venkata-chaitanya-vaddempudi/fsdweek2.git"
+    "url": "git+https://github.com/maruthi-venkata-chaitanya-vaddempudi/fsdweek3.git"
   },
   "license": "ISC",
   "author": "",

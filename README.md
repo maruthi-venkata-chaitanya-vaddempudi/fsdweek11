@@ -1,4 +1,4 @@
-# fsdweek2
+# fsdweek3
 
 ## ExpressJS EJS user registration demo
 
