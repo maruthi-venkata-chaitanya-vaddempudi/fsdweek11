@@ -22,6 +22,12 @@ React Router v6 demo includes nested pages, parameterized user profiles, a
 404 route, a live clock, an interactive counter, simulated loading, and a
 global theme toggle.
 
+## React Hooks and data sharing
+
+Run `npm start` and open `http://localhost:3000/hooks-data-sharing.html`.
+This React demo covers state and effects, an abortable `useFetch` hook,
+props drilling, lifted sibling state, and a global Context API theme.
+
 ## MongoDB CRUD and SPA
 
 Install the project dependencies with `npm install`. Copy `.env.example` to
@@ -60,3 +66,5 @@ in-memory session store is for learning only and is not suitable for production.
 # fsdweek7
 
 # fsdweek8
+
+# fsdweek9
