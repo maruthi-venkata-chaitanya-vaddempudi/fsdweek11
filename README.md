@@ -15,6 +15,13 @@ JSX expressions and inline styles, and nested function and class components.
 The JSX source is in `src/react-demo.jsx`; the start script bundles it for the
 browser with esbuild. A link to this demo is also available from the item page.
 
+## React Router and screen updates
+
+Run `npm start` and open `http://localhost:3000/react-router-demo/`. The
+React Router v6 demo includes nested pages, parameterized user profiles, a
+404 route, a live clock, an interactive counter, simulated loading, and a
+global theme toggle.
+
 ## MongoDB CRUD and SPA
 
 Install the project dependencies with `npm install`. Copy `.env.example` to
@@ -51,3 +58,5 @@ the protected dashboard. Demo credentials are `admin` / `1234`. Set
 in-memory session store is for learning only and is not suitable for production.
 
 # fsdweek7
+
+# fsdweek8
